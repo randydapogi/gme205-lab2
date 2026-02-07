@@ -90,6 +90,9 @@ class PointSet:
     
     # return bbox of points
     def bbox(self):
+        if len(self.points) == 0:
+            return None
+        
         lat_list = self.get_lat_list()
         lon_list = self.get_lon_list()
         
