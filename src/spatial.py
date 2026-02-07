@@ -1,4 +1,5 @@
 import math
+import csv
 
 class Point: 
     def __init__(self, id, lon, lat, name=None, tag=None):
@@ -56,3 +57,27 @@ class Point:
                    name=row.get("name"), 
                    tag=row.get("tag"), 
                 )
+        
+        
+class PointSet:
+    def __init__(self, points: list[Point]):
+        self.points = points
+        
+    @classmethod
+    def from_csv(cls, csv_path: str):
+        # open csv
+        # read csv syntax from gemini
+        with open(csv_path, mode='r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)
+        
+        points = []
+        for row in rows:
+            # only add points with valid coordinate to points list
+            try:
+                point = Point.from_row(row)
+                points.append(point)
+            except ValueError:
+                print(f"Row with id {row["id"]} has invalid coordinates.")
+                
+        return cls(points=points)
