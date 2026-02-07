@@ -31,3 +31,8 @@ print(pointset.bbox())
 filtered_pointset = pointset.filter_by_tag("poi")
 print(filtered_pointset.count())
 print(filtered_pointset.bbox())
+
+
+pointset.plot_lat_lon("output/lab2_preview.png")
+pointset.generate_summary_json("output/lab2_report.json")
+# filtered_pointset.plot_lat_lon("output/lab2_preview_poi.png")
