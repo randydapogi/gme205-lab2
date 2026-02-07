@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 import csv
 
 class Point: 
@@ -66,13 +67,13 @@ class PointSet:
     @classmethod
     def from_csv(cls, csv_path: str):
         # open csv
-        # read csv syntax from gemini
-        with open(csv_path, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+        try: 
+            df = pd.read_csv(csv_path)
+        except FileNotFoundError:
+            raise 
         
         points = []
-        for row in rows:
+        for index, row in df.iterrows():
             # only add points with valid coordinate to points list
             try:
                 point = Point.from_row(row)
@@ -81,3 +82,27 @@ class PointSet:
                 print(f"Row with id {row["id"]} has invalid coordinates.")
                 
         return cls(points=points)
+    
+    # return length of points
+    def count(self):
+        return len(self.points)
+    
+    # return bbox of points
+    def bbox(self):
+        lat_list = [p.lat for p in self.points]
+        lon_list = [p.lon for p in self.points]
+        
+        min_lat = min(lat_list)
+        max_lat = max(lat_list)
+        
+        min_lon = min(lon_list)
+        max_lon = max(lon_list)
+        
+        return (min_lon, min_lat, max_lon, max_lat)
+    
+    # returns pointset with tag
+    def filter_by_tag(self, tag: str):
+        # filter points with same tag
+        filtered_points = [p for p in self.points if p.tag == tag]
+        
+        return PointSet(points=filtered_points)
