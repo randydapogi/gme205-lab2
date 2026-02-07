@@ -1,6 +1,7 @@
 import math
 import pandas as pd
-import csv
+import matplotlib.pyplot as plt
+import json
 
 class Point: 
     def __init__(self, id, lon, lat, name=None, tag=None):
@@ -89,8 +90,8 @@ class PointSet:
     
     # return bbox of points
     def bbox(self):
-        lat_list = [p.lat for p in self.points]
-        lon_list = [p.lon for p in self.points]
+        lat_list = self.get_lat_list()
+        lon_list = self.get_lon_list()
         
         min_lat = min(lat_list)
         max_lat = max(lat_list)
@@ -106,3 +107,43 @@ class PointSet:
         filtered_points = [p for p in self.points if p.tag == tag]
         
         return PointSet(points=filtered_points)
+    
+    def get_lat_list(self):
+        return [p.lat for p in self.points]
+    
+    def get_lon_list(self):
+        return [p.lon for p in self.points]
+    
+    def plot_lat_lon(self, output_path):
+        # Save scatter plot (valid coords only)
+        plt.figure() 
+        if len(self.points) == 0: 
+            # Create an empty plot with message in title
+            plt.title("Preview Plot (No valid coordinates to plot)")
+        else: 
+            lat_list = self.get_lat_list()
+            lon_list = self.get_lon_list()
+            
+            plt.scatter(lon_list, lat_list)
+            plt.title("Point Preview (lon vs lat)")
+            plt.xlabel("Longitude")
+            plt.ylabel("Latitude")
+            plt.savefig(output_path, dpi=150, bbox_inches="tight")
+            plt.close()
+            
+    def generate_summary_json(self, output_path):
+        summary = {
+            "total_points": self.count(),
+            "bbox": self.bbox()
+        }
+        
+        counts = {}
+        for point in self.points:
+            tag = point.tag
+            counts[tag] = counts.get(tag, 0) + 1
+            
+        summary["tags"] = [{k: v} for k, v in counts.items()]
+        
+        with open(output_path, "w", encoding="utf-8") as f: 
+            json.dump(summary, f, indent=2)
+        
