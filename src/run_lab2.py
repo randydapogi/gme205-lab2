@@ -6,6 +6,14 @@ import json
 csv_path = "data/points.csv"
 pointset = PointSet.from_csv(csv_path)
 
+print(pointset.count())
+print(pointset.bbox())
+
+# create filtered pointset from pointset
+filtered_pointset = pointset.filter_by_tag("poi")
+print(filtered_pointset.count())
+print(filtered_pointset.bbox())
+
 # Generate lat lon plot preview
 output_plot_path = "output/lab2_preview.png"
 plt.figure() 
